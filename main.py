@@ -1,8 +1,20 @@
+import logging
+import requests
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Updater, CommandHandler, CallbackContext, CallbackQueryHandler
 import subprocess
 import re
 import time
+
+# Initialize logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# Send logs to Discord webhook
+def send_to_discord_webhook(message):
+    webhook_url = "https://discord.com/api/webhooks/1223724076229595186/BRNMJOaAdxGm3xdO3OriTQpJc8eUxCi54qDcDpmyRxNSK9lm6-xWHjY6GGxA_cZn8rmN"
+    data = {"content": message}
+    requests.post(webhook_url, json=data)
 
 # Define the start command handler
 def start(update: Update, context: CallbackContext) -> None:
@@ -50,17 +62,23 @@ def uptime(update: Update, context: CallbackContext) -> None:
 
 # Define the main function
 def main() -> None:
+    # Bot initialization code
     updater = Updater("7080171542:AAFC5jcxsl7m-8panGWvP90q5n5Xot5siWg")
-
     dispatcher = updater.dispatcher
 
+    # Add command handlers
     dispatcher.add_handler(CommandHandler("start", start))
     dispatcher.add_handler(CallbackQueryHandler(button))
     dispatcher.add_handler(CommandHandler("pingurl", ping_url))
     dispatcher.add_handler(CommandHandler("uptime", uptime))
 
-    updater.bot.start_time = time.time()  # Initialize bot start time
+    # Initialize bot start time
+    updater.bot.start_time = time.time()
 
+    # Send startup message to Discord
+    send_to_discord_webhook("Bot started successfully!")
+
+    # Start the bot
     updater.start_polling()
     updater.idle()
 
